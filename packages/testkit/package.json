@@ -1,0 +1,22 @@
+{
+  "name": "@reelstr/testkit",
+  "version": "0.1.0",
+  "description": "Test helpers: relays, Blossom, mints and Lightning nodes for the test suites",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aditihedaoo26/reelstr-amazon-.git"
+  },
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "dependencies": {
+    "@cashu/cashu-ts": "4.11.0",
+    "@noble/hashes": "latest",
+    "@reelstr/bolt11": "workspace:*",
+    "@reelstr/nostr": "workspace:*",
+    "@reelstr/protocol": "workspace:*",
+    "nostr-tools": "2.25.2"
+  }
+}

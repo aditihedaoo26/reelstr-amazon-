@@ -1,0 +1,35 @@
+{
+  "name": "reelstr",
+  "version": "0.1.0",
+  "description": "Reelstr: open-source serial video on Nostr, with per-episode sats and signed revenue splits",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aditihedaoo26/reelstr-amazon-.git"
+  },
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "apps/*",
+    "services/*",
+    "e2e",
+    "demo",
+    "interop"
+  ],
+  "scripts": {
+    "check": "biome check . && tsc -b && bun test packages services interop",
+    "test": "bun test packages services interop",
+    "lint": "biome check .",
+    "fix": "biome check --write .",
+    "test:fast": "bun test packages/protocol packages/nostr packages/blossom",
+    "test:e2e": "bun test e2e",
+    "demo": "bun --cwd demo start",
+    "demo:empty": "bun --cwd demo start:empty"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.15",
+    "@types/bun": "latest",
+    "typescript": "7.0.2"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "name": "@reelstr/agent",
+  "version": "0.1.0",
+  "description": "Generation agent and the Source Verified verifier",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aditihedaoo26/reelstr-amazon-.git"
+  },
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "start": "bun src/server.ts",
+    "verifier": "bun src/verifier/server.ts"
+  },
+  "dependencies": {
+    "@cashu/cashu-ts": "4.11.0",
+    "@noble/hashes": "latest",
+    "@reelstr/app-core": "workspace:*",
+    "@reelstr/blossom": "workspace:*",
+    "@reelstr/media": "workspace:*",
+    "@reelstr/nostr": "workspace:*",
+    "@reelstr/protocol": "workspace:*",
+    "@reelstr/wallet": "workspace:*",
+    "@reelstr/keys": "workspace:*"
+  },
+  "devDependencies": {
+    "@reelstr/indexer": "workspace:*",
+    "@reelstr/media-service": "workspace:*",
+    "@reelstr/testkit": "workspace:*"
+  }
+}

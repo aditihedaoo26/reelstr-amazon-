@@ -1,0 +1,18 @@
+{
+  "name": "@reelstr/interop",
+  "description": "Independent Python reader and interoperability tests",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aditihedaoo26/reelstr-amazon-.git"
+  },
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@noble/hashes": "latest",
+    "@reelstr/blossom": "workspace:*",
+    "@reelstr/nostr": "workspace:*",
+    "@reelstr/protocol": "workspace:*",
+    "nostr-tools": "2.25.2"
+  }
+}

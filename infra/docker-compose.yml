@@ -1,0 +1,192 @@
+# Full stack. Copy .env.example to .env and set PUBLIC_HOST to the address a BROWSER uses to reach this
+# machine (localhost for local use, the VM's DNS name or IP when deployed).
+#   docker compose up -d                      relay, crew, blossom, postgres, media, indexer, keys, web
+#   docker compose --profile mint up -d       + a test Cashu mint (free test sats)
+#   docker compose --profile payouts up -d    + the custodial split service (see the Security model in docs/ARCHITECTURE.md first)
+#   docker compose --profile agent up -d      + a generation agent;  --profile verifier: + a verifier
+# Containers reach each other by service name; URL_REWRITE maps the public addresses that appear inside
+# published events (blob and mint URLs) to those internal names.
+# Ports are published on loopback only (BIND=0.0.0.0 to expose them). Behind a reverse proxy that serves
+# the services under one hostname and path prefix, set BLOSSOM_PUBLIC_URL / MINT_URL to the public URLs and
+# MEDIA_PATH_PREFIX / KEYS_PATH_PREFIX to the stripped prefixes (`bun demo/tools/envgen.ts --public-base ...`).
+# On a shared machine add:  -f docker-compose.yml -f docker-compose.limits.yml
+name: reelstr
+
+# One image for every Bun service, built once by `indexer` (the others only reuse the tag)
+x-service: &svc
+  image: localhost/reelstr-services:latest
+  restart: unless-stopped
+  environment: &env
+    RELAYS: ws://relay:3334
+    URL_REWRITE: "${BLOSSOM_PUBLIC_URL:-http://localhost:3100}=http://blossom:3100,${MINT_URL:-http://localhost:3338}=http://mint:3338"
+services:
+  relay:
+    image: localhost/reelstr-relay:latest
+    build: ../services/relay
+    environment:
+      POW_BITS: "${POW_BITS:-16}"
+    ports: ["${BIND:-127.0.0.1}:3334:3334"]
+    volumes: [relay-data:/data]
+    restart: unless-stopped
+
+  blossom:
+    image: localhost/reelstr-blossom:latest
+    build: ./blossom
+    environment:
+      BLOSSOM_PUBLIC_URL: "${BLOSSOM_PUBLIC_URL:-http://localhost:3100}"
+    ports: ["${BIND:-127.0.0.1}:3100:3100"]
+    volumes: [blossom-data:/data]
+    restart: unless-stopped
+
+  postgres:
+    image: docker.io/library/postgres:17-alpine
+    environment:
+      POSTGRES_USER: reelstr
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-reelstr-dev}"
+      POSTGRES_DB: reelstr
+    ports: ["127.0.0.1:5432:5432"]
+    volumes: [pg-data:/var/lib/postgresql/data]
+    restart: unless-stopped
+
+  # Cashu mint for development only: FakeWallet mints without real Lightning. Never point real funds at it.
+  mint:
+    image: docker.io/cashubtc/nutshell:latest
+    command: ["poetry", "run", "mint"]
+    environment:
+      MINT_BACKEND_BOLT11_SAT: FakeWallet
+      MINT_LISTEN_HOST: 0.0.0.0
+      MINT_LISTEN_PORT: "3338"
+      MINT_PRIVATE_KEY: "${MINT_PRIVATE_KEY:-dev-only-change-me}"
+      MINT_INFO_NAME: reelstr-dev-mint
+    ports: ["${BIND:-127.0.0.1}:3338:3338"]
+    volumes: [mint-data:/root/.cashu]
+    profiles: ["mint"]
+
+  crew:
+    image: localhost/reelstr-crew:latest
+    build: ../services/crew
+    environment:
+      RELAY_SECRET: "${CREW_RELAY_SECRET:?set CREW_RELAY_SECRET (64 hex): group state is signed by it}"
+      DOMAIN: "${PUBLIC_HOST:-localhost}"
+    ports: ["${BIND:-127.0.0.1}:3335:3335"]
+    volumes: [crew-data:/data]
+    restart: unless-stopped
+
+  media:
+    <<: *svc
+    image: localhost/reelstr-media:latest
+    build:
+      context: ..
+      target: "${MEDIA_TARGET:-services}"
+    command: ["bun", "services/media/src/server.ts"]
+    volumes: [media-state:/state]
+    environment:
+      <<: *env
+      PORT: "3200"
+      PUBLIC_PATH_PREFIX: "${MEDIA_PATH_PREFIX:-}"
+      BLOSSOM_URL: http://blossom:3100
+      MEDIA_ALLOW: "${MEDIA_ALLOW:-}"
+    ports: ["${BIND:-127.0.0.1}:3200:3200"]
+    depends_on: [blossom]
+
+  indexer:
+    <<: *svc
+    build:
+      context: ..
+      target: services
+    command: ["bun", "services/indexer/src/server.ts"]
+    environment:
+      <<: *env
+      PORT: "3300"
+      DATABASE_URL: "postgres://reelstr:${POSTGRES_PASSWORD:-reelstr-dev}@postgres:5432/reelstr"
+    ports: ["${BIND:-127.0.0.1}:3300:3300"]
+    depends_on: [relay, postgres]
+
+  keys:
+    <<: *svc
+    command: ["bun", "services/keys/src/server.ts"]
+    environment:
+      <<: *env
+      PORT: "3400"
+      PUBLIC_PATH_PREFIX: "${KEYS_PATH_PREFIX:-}"
+      LEDGER_DB: /state/keys.db
+      MINTS: "${MINT_URL:-http://localhost:3338}"
+      PHOENIXD_URL: "${PHOENIXD_URL:-}"
+      PHOENIXD_PASSWORD: "${PHOENIXD_PASSWORD:-}"
+      LND_URL: "${LND_URL:-}"
+      LND_MACAROON: "${LND_MACAROON:-}"
+    ports: ["${BIND:-127.0.0.1}:3400:3400"]
+    volumes: [keys-state:/state]
+
+  split:
+    <<: *svc
+    command: ["bun", "services/split/src/server.ts"]
+    environment:
+      <<: *env
+      LEDGER_DB: /state/keys.db
+      MINTS: "${MINT_URL:-http://localhost:3338}"
+      SPLIT_ACKNOWLEDGE_CUSTODY: "${SPLIT_ACKNOWLEDGE_CUSTODY:-}"
+      PHOENIXD_URL: "${PHOENIXD_URL:-}"
+      PHOENIXD_PASSWORD: "${PHOENIXD_PASSWORD:-}"
+      LND_URL: "${LND_URL:-}"
+      LND_MACAROON: "${LND_MACAROON:-}"
+    volumes: [keys-state:/state]
+    profiles: ["payouts"]
+
+  agent:
+    <<: *svc
+    command: ["bun", "services/agent/src/server.ts"]
+    environment:
+      <<: *env
+      AGENT_NAME: "${AGENT_NAME:-demo-bot}"
+      AGENT_NSEC: "${AGENT_NSEC:-}"
+      AGENT_LOCK_PRIVKEY: "${AGENT_LOCK_PRIVKEY:-}"
+      BLOSSOM_URL: http://blossom:3100
+      MEDIA_URL: http://media:3200
+      MINT_URL: "${MINT_URL:-http://localhost:3338}"
+      AGENT_LEDGER_DB: /state/agent.db
+      FAL_KEY: "${FAL_KEY:-}"
+      GEMINI_API_KEY: "${GEMINI_API_KEY:-}"
+      GEMINI_VEO_MODEL: "${GEMINI_VEO_MODEL:-}"
+      AGENT_ALLOW_CLOSED: "${AGENT_ALLOW_CLOSED:-}"
+      MOCK: "${MOCK:-}"
+    volumes: [agent-state:/state]
+    depends_on: [media]
+    profiles: ["agent"]
+
+  verifier:
+    <<: *svc
+    command: ["bun", "services/agent/src/verifier/server.ts"]
+    environment:
+      <<: *env
+      VERIFIER_NSEC: "${VERIFIER_NSEC:-}"
+      FAL_KEY: "${FAL_KEY:-}"
+      MOCK: "${MOCK:-}"
+    profiles: ["verifier"]
+
+  web:
+    image: localhost/reelstr-web:latest
+    build:
+      context: ..
+      target: web
+      args:
+        VITE_RELAYS: "ws://${PUBLIC_HOST:-localhost}:3334"
+        VITE_BLOSSOM: "http://${PUBLIC_HOST:-localhost}:3100"
+        VITE_MEDIA_URL: "http://${PUBLIC_HOST:-localhost}:3200"
+        VITE_INDEXER_URL: "http://${PUBLIC_HOST:-localhost}:3300"
+        VITE_KEYS_URL: "http://${PUBLIC_HOST:-localhost}:3400"
+        VITE_MINT: "${MINT_URL:-http://localhost:3338}"
+        VITE_VERIFIERS: "${VERIFIERS:-}"
+        VITE_FIAT_DEMO: "${FIAT_DEMO:-}"
+    ports: ["${BIND:-127.0.0.1}:5173:5173"]
+    restart: unless-stopped
+
+volumes:
+  crew-data:
+  keys-state:
+  media-state:
+  agent-state:
+  relay-data:
+  blossom-data:
+  pg-data:
+  mint-data:

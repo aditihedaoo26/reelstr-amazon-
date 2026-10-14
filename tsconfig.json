@@ -1,0 +1,56 @@
+{
+  "files": [],
+  "references": [
+    {
+      "path": "packages/protocol"
+    },
+    {
+      "path": "packages/nostr"
+    },
+    {
+      "path": "packages/blossom"
+    },
+    {
+      "path": "packages/media"
+    },
+    {
+      "path": "packages/testkit"
+    },
+    {
+      "path": "services/media"
+    },
+    {
+      "path": "services/indexer"
+    },
+    {
+      "path": "packages/app-core"
+    },
+    {
+      "path": "packages/ui"
+    },
+    {
+      "path": "apps/web"
+    },
+    {
+      "path": "e2e"
+    },
+    {
+      "path": "demo"
+    },
+    {
+      "path": "packages/bolt11"
+    },
+    {
+      "path": "services/keys"
+    },
+    {
+      "path": "services/split"
+    },
+    {
+      "path": "services/agent"
+    },
+    {
+      "path": "interop"
+    }
+  ]
+}

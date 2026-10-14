@@ -1,0 +1,27 @@
+{
+  "name": "@reelstr/wallet",
+  "version": "0.1.0",
+  "description": "Cashu wallet, NIP-60 and NIP-61 nutzaps, NWC, zap splits and unlock flows",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aditihedaoo26/reelstr-amazon-.git"
+  },
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "dependencies": {
+    "@cashu/cashu-ts": "4.11.0",
+    "@reelstr/nostr": "workspace:*",
+    "@reelstr/protocol": "workspace:*",
+    "nostr-tools": "2.25.2",
+    "@noble/hashes": "latest",
+    "@reelstr/bolt11": "workspace:*"
+  },
+  "devDependencies": {
+    "@reelstr/testkit": "workspace:*"
+  },
+  "sideEffects": [
+    "*.css"
+  ]
+}

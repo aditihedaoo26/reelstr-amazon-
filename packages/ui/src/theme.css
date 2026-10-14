@@ -1,0 +1,1741 @@
+@import "@fontsource-variable/outfit";
+@import "@fontsource-variable/jetbrains-mono";
+
+/*
+ * Sections, in file order (search for the comment named here):
+ *   palette and tokens (top)      type: .label, .figure        buttons: the press
+ *   cards, covers, phone frame    layout: .cols, steps, chat   sign-in gate
+ *   header, tabs, bottom strip    notices and in-page links    landing motion
+ *   testnet badge and faucet      page width, equal cards, native-shell safe areas (last)
+ */
+
+/*
+ * Reelstr, palette "Pine & Cream".
+ *
+ * Warm, flat and light: no glow, no glass, no blur. The numbers (sats, shares, seconds) carry the
+ * page and the colour stays out of their way. Four roles, and the split between the first two is
+ * load-bearing:
+ *
+ *   --primary  periwinkle. Identity and the main action: wordmark, buttons, focus.
+ *   --fair     leaf green. Meaning only: verified, paid, unlocked, free. Never decoration.
+ *   --accent   warm orange. The second action, and warnings.
+ *   --hero     deep pine. One feature surface per page, never a signal.
+ *
+ * One near-black, --ink, draws every border AND every shadow, so a hard shadow and its outline
+ * always read as one object. Shadows are solid and unblurred; interactive surfaces press into them.
+ */
+
+:root {
+  --bg: oklch(0.965 0.045 96);
+  --card: oklch(0.99 0.014 96);
+  --fg: oklch(0.24 0.03 162);
+  --ink: oklch(0.21 0.028 162);
+
+  --primary: oklch(0.74 0.125 292);
+  --primary-fg: oklch(0.24 0.04 292);
+  --secondary: oklch(0.93 0.042 128);
+  --muted: oklch(0.94 0.035 110);
+  --muted-fg: oklch(0.45 0.028 162);
+  --accent: oklch(0.72 0.155 46);
+  --accent-fg: oklch(0.24 0.05 46);
+  --fair: oklch(0.5 0.14 155);
+  --fair-tint: oklch(0.93 0.06 155);
+  --danger: oklch(0.55 0.19 27);
+  --hero: oklch(0.35 0.062 162);
+  --hero-fg: oklch(0.97 0.02 120);
+  --ring: oklch(0.45 0.16 292);
+
+  --shadow-1: 0 2px 0 0 var(--ink);
+  --shadow-2: 0 4px 0 0 var(--ink);
+  --radius: 1.5rem;
+
+  --font-sans: "Outfit Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* legacy names still used by a few inline styles */
+  --panel: var(--card);
+  --line: var(--ink);
+  --text: var(--fg);
+  --muted-text: var(--muted-fg);
+  --ok: var(--fair);
+  --err: var(--danger);
+
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+  border-color: var(--ink);
+}
+html {
+  -webkit-text-size-adjust: 100%;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font: 400 1rem / 1.55 var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+:focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 2px;
+}
+::selection {
+  background: var(--primary);
+  color: var(--primary-fg);
+}
+
+/* ------------------------------------------------------------------ type */
+
+h1,
+h2,
+h3 {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin: 0;
+}
+h1 {
+  font-size: clamp(1.9rem, 4vw, 2.6rem);
+  margin-bottom: 0.4rem;
+}
+h2 {
+  font-size: 1.25rem;
+  margin: 2rem 0 0.75rem;
+}
+h3 {
+  font-size: 1.05rem;
+}
+p {
+  margin: 0.5rem 0;
+}
+a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--primary);
+}
+a:hover {
+  text-decoration-color: var(--ink);
+}
+code,
+.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+code {
+  font-size: 0.875em;
+}
+.muted {
+  color: var(--muted-fg);
+}
+.error {
+  color: var(--danger);
+  font-weight: 500;
+}
+.ok {
+  color: var(--fair);
+  font-weight: 600;
+}
+
+/* The small letterspaced caps that label every panel. */
+.label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted-fg);
+}
+/* The headline figure, with the fraction or unit set small. */
+.figure {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  font-size: clamp(2.4rem, 7vw, 3.75rem);
+}
+.figure small {
+  font-family: var(--font-sans);
+  font-size: 0.32em;
+  letter-spacing: 0;
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+/* -------------------------------------------------------------- surfaces */
+
+.card,
+[role="dialog"]:not(.hero) {
+  background: var(--card);
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-2);
+  padding: 1.25rem 1.4rem;
+  margin: 0 0 1rem;
+}
+.card > :first-child {
+  margin-top: 0;
+}
+.card > :last-child {
+  margin-bottom: 0;
+}
+.card-soft {
+  background: var(--secondary);
+}
+.card-inset {
+  background: var(--bg);
+  border: 2px solid var(--ink);
+  border-radius: 1rem;
+  box-shadow: var(--shadow-1);
+  padding: 0.75rem 1rem;
+}
+.hero {
+  position: relative;
+  overflow: hidden;
+  background: var(--hero);
+  color: var(--hero-fg);
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-2);
+  padding: 1.75rem 1.75rem 2rem;
+  margin: 0 0 1.25rem;
+}
+.hero .label,
+.hero .muted {
+  color: color-mix(in oklab, var(--hero-fg) 74%, transparent);
+}
+.hero h1 {
+  margin-top: 0.35rem;
+}
+.hero a {
+  text-decoration-color: var(--primary);
+}
+.hero-inset {
+  background: color-mix(in oklab, var(--hero-fg) 12%, transparent);
+  border: 1px solid color-mix(in oklab, var(--hero-fg) 18%, transparent);
+  border-radius: 1rem;
+  padding: 0.7rem 1rem;
+}
+
+/* ---------------------------------------------------------------- buttons */
+
+button,
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0 1.25rem;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: var(--primary);
+  color: var(--primary-fg);
+  box-shadow: var(--shadow-2);
+  font: 600 0.9375rem / 1 var(--font-sans);
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    transform 90ms cubic-bezier(0.2, 0, 0, 1),
+    box-shadow 90ms cubic-bezier(0.2, 0, 0, 1),
+    filter 120ms ease;
+}
+button:hover:not(:disabled),
+.btn:hover {
+  filter: brightness(1.04);
+}
+/* The press: travel equals the shadow depth, so it lands flush and springs back. */
+button:active:not(:disabled),
+.btn:active {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 0 var(--ink);
+}
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: var(--shadow-1);
+}
+button.ghost,
+.btn-plain {
+  background: var(--card);
+  color: var(--fg);
+}
+.btn-accent {
+  background: var(--accent);
+  color: var(--accent-fg);
+}
+.btn-ink {
+  background: var(--ink);
+  color: var(--bg);
+  box-shadow: 0 4px 0 0 var(--accent);
+}
+.btn-ink:active {
+  box-shadow: 0 0 0 0 var(--accent);
+}
+.btn-sm,
+button.sm {
+  min-height: 2.25rem;
+  padding: 0 0.9rem;
+  font-size: 0.8125rem;
+  box-shadow: var(--shadow-1);
+}
+.btn-sm:active,
+button.sm:active:not(:disabled) {
+  transform: translateY(2px);
+}
+@media (prefers-reduced-motion: reduce) {
+  button,
+  .btn {
+    transition: none;
+  }
+}
+
+/* ------------------------------------------------------------------ forms */
+
+input,
+textarea,
+select {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.55rem 0.95rem;
+  background: var(--card);
+  color: var(--fg);
+  border: 2px solid var(--ink);
+  border-radius: 1rem;
+  font: inherit;
+  box-shadow: var(--shadow-1);
+}
+input::placeholder,
+textarea::placeholder {
+  color: color-mix(in oklab, var(--fg) 45%, transparent);
+}
+textarea {
+  border-radius: 1rem;
+  resize: vertical;
+}
+input[type="file"] {
+  padding: 0.5rem 0.75rem;
+}
+input[type="checkbox"],
+input[type="radio"] {
+  width: 1.35rem;
+  min-height: 1.35rem;
+  height: 1.35rem;
+  padding: 0;
+  accent-color: var(--primary);
+  box-shadow: none;
+  flex: none;
+}
+label {
+  display: block;
+  margin: 0.9rem 0 0.35rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted-fg);
+}
+label.check {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0.6rem 0;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--fg);
+}
+fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+
+/* ----------------------------------------------------------------- tables */
+
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  font-variant-numeric: tabular-nums;
+}
+th {
+  text-align: left;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted-fg);
+  padding: 0.4rem 0.6rem;
+  border-bottom: 2px solid var(--ink);
+}
+td {
+  text-align: left;
+  padding: 0.55rem 0.6rem;
+  border-bottom: 1px solid color-mix(in oklab, var(--ink) 18%, transparent);
+  font-size: 0.9rem;
+}
+td:nth-child(n + 3),
+th:nth-child(n + 3) {
+  font-family: var(--font-mono);
+}
+tfoot td {
+  font-weight: 700;
+  border-bottom: 0;
+  border-top: 2px solid var(--ink);
+}
+.split th:nth-child(n + 3),
+.split td:nth-child(n + 3) {
+  text-align: right;
+}
+
+/* ---------------------------------------------------------- chips and pills */
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.1rem 0.65rem;
+  min-height: 1.6rem;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--fg);
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.pill-fair {
+  background: var(--fair-tint);
+  color: var(--fair);
+}
+.pill-accent {
+  background: var(--accent);
+  color: var(--accent-fg);
+}
+.pill-primary {
+  background: var(--primary);
+  color: var(--primary-fg);
+}
+.dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* ----------------------------------------------------------------- layout */
+
+.wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 3rem;
+}
+.row {
+  display: flex;
+  gap: 0.9rem;
+  flex-wrap: wrap;
+}
+.row > * {
+  flex: 1;
+  min-width: 160px;
+}
+.row.tight > * {
+  flex: none;
+  min-width: 0;
+}
+.between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+.stack > * + * {
+  margin-top: 0.75rem;
+}
+.grid {
+  display: grid;
+  gap: 1.1rem;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  margin-bottom: 1rem;
+}
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+.skip {
+  position: absolute;
+  left: -9999px;
+  top: 0.75rem;
+  z-index: 60;
+}
+.skip:focus {
+  left: 0.75rem;
+}
+
+/* ------------------------------------------------------------- app shell */
+
+.bar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  padding: 0.7rem 1.25rem;
+  background: var(--bg);
+  border-bottom: 2px solid var(--ink);
+}
+.brand {
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2.75rem;
+}
+.brand b {
+  color: var(--primary);
+  font-weight: 800;
+}
+.brand-mark {
+  width: 1.7rem;
+  height: 1.7rem;
+  flex: none;
+}
+.bar nav {
+  display: flex;
+  gap: 0.25rem;
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.bar nav::-webkit-scrollbar {
+  display: none;
+}
+.bar nav a {
+  flex: none;
+  padding: 0 0.85rem;
+  line-height: 2.5rem;
+  border-radius: 0.75rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--muted-fg);
+  text-decoration: none;
+}
+.bar nav a:hover {
+  background: var(--secondary);
+  color: var(--fg);
+}
+.bar nav a[aria-current="page"] {
+  background: var(--primary);
+  color: var(--primary-fg);
+  font-weight: 600;
+}
+.bar .grow {
+  flex: 1;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 2.5rem;
+  padding: 0 0.9rem;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: var(--card);
+  box-shadow: var(--shadow-1);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.chip .num {
+  font-weight: 700;
+}
+.bar .signout {
+  min-height: 2.5rem;
+  padding: 0 0.9rem;
+  box-shadow: var(--shadow-1);
+  font-size: 0.875rem;
+}
+.bottomnav {
+  display: none;
+}
+@media (max-width: 760px) {
+  .bar {
+    padding: 0.55rem 0.9rem;
+    gap: 0.6rem;
+  }
+  .bar nav,
+  .bar .signout,
+  .bar .who {
+    display: none;
+  }
+  .bar .grow {
+    display: block;
+  }
+  .bottomnav {
+    display: flex;
+    gap: 0.4rem;
+    position: fixed;
+    inset: auto 0 0 0;
+    z-index: 40;
+    padding: 0.5rem 0.6rem calc(0.5rem + env(safe-area-inset-bottom));
+    overflow-x: auto;
+    background: var(--card);
+    border-top: 2px solid var(--ink);
+    scrollbar-width: none;
+  }
+  .bottomnav::-webkit-scrollbar {
+    display: none;
+  }
+  .bottomnav a {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.5rem;
+    padding: 0 0.95rem;
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    background: var(--card);
+    box-shadow: var(--shadow-1);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--fg);
+  }
+  .bottomnav a[aria-current="page"] {
+    background: var(--primary);
+    color: var(--primary-fg);
+  }
+  .wrap {
+    padding: 1rem 0.9rem 6rem;
+  }
+  .hero {
+    padding: 1.35rem 1.25rem 1.5rem;
+  }
+}
+
+/* ------------------------------------------------------------- sign in */
+
+.gate {
+  margin: 0 auto;
+  padding: 2.5rem 1.1rem 3rem;
+}
+.gate section {
+  background: var(--card);
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-2);
+  padding: 1.1rem 1.25rem 1.25rem;
+  margin: 0 0 1rem;
+}
+.gate section h2 {
+  margin: 0 0 0.6rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted-fg);
+}
+.gate section button {
+  margin-top: 0.75rem;
+  width: 100%;
+}
+.gate section input + button {
+  margin-top: 0.6rem;
+}
+.nsec {
+  display: block;
+  word-break: break-all;
+  padding: 0.8rem 0.9rem;
+  background: var(--bg);
+  border: 2px dashed var(--ink);
+  border-radius: 1rem;
+  margin: 0.6rem 0;
+  font-size: 0.8125rem;
+}
+
+/* ----------------------------------------------------- series and episodes */
+
+/* A cover has no artwork to show, so it is typography on a flat colour: honest and on brand. */
+.cover {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1.5rem;
+  min-height: 15rem;
+  padding: 1.1rem 1.2rem 1.2rem;
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-2);
+  text-decoration: none;
+  color: var(--ink);
+  transition:
+    transform 90ms cubic-bezier(0.2, 0, 0, 1),
+    box-shadow 90ms cubic-bezier(0.2, 0, 0, 1);
+}
+.cover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 0 var(--ink);
+}
+.cover:active {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 0 var(--ink);
+}
+.cover .cover-title {
+  font-size: 1.7rem;
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  overflow-wrap: anywhere;
+}
+.cover p {
+  margin: 0.4rem 0 0;
+  font-size: 0.9rem;
+  opacity: 0.8;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.cover .between {
+  align-items: flex-end;
+}
+.tone-0 {
+  background: var(--primary);
+}
+.tone-1 {
+  background: var(--accent);
+}
+.tone-2 {
+  background: var(--secondary);
+}
+.tone-3 {
+  background: var(--hero);
+  color: var(--hero-fg);
+}
+.tone-3 .pill {
+  color: var(--fg);
+}
+.ep {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid color-mix(in oklab, var(--ink) 18%, transparent);
+}
+.ep:last-child {
+  border-bottom: 0;
+}
+.ep .ep-no {
+  flex: none;
+  width: 2.6rem;
+  height: 2.6rem;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--ink);
+  border-radius: 0.85rem;
+  background: var(--bg);
+  font-family: var(--font-mono);
+  font-weight: 700;
+}
+.ep .ep-main {
+  flex: 1;
+  min-width: 0;
+}
+.ep .ep-title {
+  font-weight: 600;
+  text-decoration: none;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ep .ep-title:hover {
+  text-decoration: underline;
+  text-decoration-color: var(--primary);
+}
+.stars {
+  color: var(--accent);
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+/* A phone-shaped frame for vertical video. */
+.phone {
+  width: min(100%, 22rem);
+  margin: 0 auto 1.25rem;
+  padding: 0.55rem;
+  background: var(--ink);
+  border: 2px solid var(--ink);
+  border-radius: 2rem;
+  box-shadow: 0 6px 0 0 var(--primary);
+}
+.phone .player,
+.phone video {
+  display: block;
+  width: 100%;
+  border-radius: 1.5rem;
+}
+.player {
+  width: 100%;
+  max-height: 78vh;
+  aspect-ratio: 9 / 16;
+  background: #000;
+  border-radius: 1.5rem;
+  object-fit: contain;
+}
+.watch {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: minmax(0, 24rem) minmax(0, 1fr);
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .watch {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.watch .phone {
+  position: sticky;
+  top: 5.2rem;
+  margin: 0;
+  width: 100%;
+}
+@media (max-width: 900px) {
+  .watch .phone {
+    position: static;
+    margin: 0 auto;
+    width: min(100%, 22rem);
+  }
+}
+
+/* ------------------------------------------------------------- story tree */
+
+.tree {
+  width: 100%;
+  max-width: 100%;
+  overflow: auto;
+  display: block;
+  background: var(--card);
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-2);
+  margin-bottom: 1rem;
+}
+.tree .node rect {
+  fill: var(--bg);
+  stroke: var(--ink);
+  stroke-width: 2;
+}
+.tree .node text {
+  fill: var(--fg);
+  font: 600 12px var(--font-sans);
+  pointer-events: none;
+}
+.tree .node {
+  cursor: pointer;
+}
+.tree .node:hover rect {
+  fill: var(--secondary);
+}
+.tree .node.used rect {
+  fill: var(--fair-tint);
+  stroke: var(--fair);
+}
+.tree .node.sel rect {
+  fill: var(--primary);
+}
+.tree .node.sel text {
+  fill: var(--primary-fg);
+}
+.tree .edge {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 2;
+  opacity: 0.35;
+}
+.tree .edge.used {
+  stroke: var(--fair);
+  opacity: 1;
+}
+
+/* ------------------------------------------------------------------ misc */
+
+.empty {
+  text-align: center;
+  padding: 2.25rem 1rem;
+  color: var(--muted-fg);
+}
+.empty strong {
+  display: block;
+  color: var(--fg);
+  font-size: 1.1rem;
+  margin-bottom: 0.25rem;
+}
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.stat .num {
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+.stats {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr));
+  margin-top: 1.25rem;
+}
+.rule {
+  height: 0;
+  border: 0;
+  border-top: 2px solid var(--ink);
+  margin: 1rem 0;
+}
+details {
+  border: 2px solid var(--ink);
+  border-radius: 1rem;
+  padding: 0.5rem 1rem;
+  background: var(--card);
+}
+summary {
+  cursor: pointer;
+  font-weight: 600;
+  min-height: 2rem;
+}
+progress {
+  accent-color: var(--primary);
+}
+
+/* two columns that fold to one */
+.cols {
+  display: grid;
+  gap: 0 1.25rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+  align-items: start;
+}
+.hero label {
+  color: color-mix(in oklab, var(--hero-fg) 74%, transparent);
+}
+.hero .nsec {
+  background: color-mix(in oklab, var(--hero-fg) 10%, transparent);
+  border-color: color-mix(in oklab, var(--hero-fg) 40%, transparent);
+  color: var(--hero-fg);
+}
+.hero input,
+.hero select,
+.hero textarea {
+  box-shadow: none;
+}
+.scroll {
+  overflow-x: auto;
+}
+.card h3 {
+  margin-bottom: 0.25rem;
+}
+.stats {
+  grid-template-columns: repeat(auto-fit, minmax(6.5rem, 11rem));
+}
+.hero-inset.stat .num {
+  font-size: 2rem;
+}
+@media (max-width: 760px) {
+  td,
+  th {
+    padding: 0.5rem 0.35rem;
+    font-size: 0.8rem;
+  }
+  .hero-inset.stat .num {
+    font-size: 1.5rem;
+  }
+}
+
+/* numbered steps on long forms */
+.step {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+.step h2 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+.step-no {
+  flex: none;
+  width: 2rem;
+  height: 2rem;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--primary-fg);
+  font: 700 0.9rem var(--font-mono);
+  box-shadow: var(--shadow-1);
+}
+
+ol.steps {
+  margin: 0.5rem 0 0;
+  padding-left: 1.3rem;
+}
+ol.steps li {
+  margin: 0.55rem 0;
+}
+
+/* chat */
+.bubble {
+  max-width: 85%;
+  margin: 0.5rem 0;
+  padding: 0.5rem 0.8rem;
+  border: 2px solid var(--ink);
+  border-radius: 1rem 1rem 1rem 0.25rem;
+  background: var(--bg);
+  box-shadow: var(--shadow-1);
+}
+.bubble.mine {
+  margin-left: auto;
+  border-radius: 1rem 1rem 0.25rem 1rem;
+  background: var(--primary);
+  color: var(--primary-fg);
+}
+.bubble.mine .label {
+  color: inherit;
+  opacity: 0.7;
+}
+
+.compose {
+  display: grid;
+  gap: 0 1.25rem;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  align-items: start;
+}
+.compose aside {
+  position: sticky;
+  top: 5.2rem;
+}
+@media (max-width: 900px) {
+  .compose {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .compose aside {
+    position: static;
+  }
+}
+
+.film-art {
+  position: absolute;
+  right: 1.75rem;
+  bottom: -1.6rem;
+  width: 13.5rem;
+  height: auto;
+  pointer-events: none;
+}
+@media (max-width: 900px) {
+  .film-art {
+    display: none;
+  }
+}
+.hero > :not(.film-art) {
+  position: relative;
+}
+
+/* sign in: pitch on the left, the four ways in on the right */
+.gate {
+  max-width: 1000px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+  padding-top: 3rem;
+}
+.gate-hero {
+  min-height: 26rem;
+  margin: 0;
+  padding: 2rem 2rem 2.25rem;
+}
+.gate-hero h1 {
+  font-size: clamp(2.4rem, 5vw, 3.4rem);
+  margin: 1.25rem 0 0.5rem;
+}
+.points {
+  list-style: none;
+  padding: 0;
+  margin: 1.25rem 0 0;
+  max-width: 17rem;
+}
+.points li {
+  position: relative;
+  padding-left: 1.4rem;
+  margin: 0.55rem 0;
+}
+.points li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.45rem;
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 50%;
+  background: var(--primary);
+}
+.gate .gate-hero .brand {
+  font-size: 1.5rem;
+}
+@media (max-width: 900px) {
+  .gate {
+    grid-template-columns: minmax(0, 1fr);
+    padding-top: 1rem;
+  }
+  .gate-hero {
+    min-height: 0;
+  }
+}
+
+.gate-hero .film-art {
+  top: 1.6rem;
+  bottom: auto;
+  right: 1.4rem;
+  width: 8.5rem;
+}
+.gate-hero .brand {
+  max-width: calc(100% - 9.5rem);
+}
+
+/* sign in: the pitch card is as tall as the column of options, with the artwork anchored at its foot */
+.gate {
+  align-items: stretch;
+}
+.gate-hero {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.gate-hero .points {
+  max-width: 19rem;
+}
+.gate-hero .film-art {
+  top: auto;
+  bottom: -1.4rem;
+  right: 1.6rem;
+  width: 14rem;
+}
+.gate-hero .brand {
+  max-width: none;
+}
+@media (max-width: 900px) {
+  .gate-hero .film-art {
+    display: block;
+    width: 9rem;
+    bottom: -1rem;
+  }
+  .gate-hero {
+    padding-bottom: 7.5rem;
+  }
+}
+.landing .hero h1 {
+  max-width: 40rem;
+}
+.landing .grid .cover:hover {
+  transform: none;
+  box-shadow: var(--shadow-2);
+}
+.bar > a.btn {
+  min-height: 2.5rem;
+  padding: 0 1.1rem;
+}
+
+.gate-forms section:last-of-type {
+  margin-bottom: 0;
+}
+.grid-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+@media (max-width: 900px) {
+  .grid-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 620px) {
+  .grid-3 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.step-card {
+  min-height: 12rem;
+  cursor: default;
+}
+.step-card p {
+  display: block;
+  -webkit-line-clamp: unset;
+  opacity: 0.85;
+  font-size: 0.95rem;
+}
+.landing .hero.cta {
+  text-align: center;
+  padding: 2.5rem 1.5rem 2.75rem;
+}
+.landing .hero.cta h1 {
+  max-width: none;
+  margin: 0 auto 1rem;
+}
+
+/* ------------------------------------------------------------ back button */
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2.25rem;
+  padding: 0 1rem 0 0.8rem;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--fg);
+  box-shadow: var(--shadow-1);
+  font: 600 0.8125rem / 1 var(--font-sans);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform 90ms cubic-bezier(0.2, 0, 0, 1),
+    box-shadow 90ms cubic-bezier(0.2, 0, 0, 1);
+}
+.back span {
+  display: inline-block;
+  transition: transform 140ms cubic-bezier(0.2, 0, 0, 1);
+}
+.back:hover span {
+  transform: translateX(-3px);
+}
+.back:active {
+  transform: translateY(2px);
+  box-shadow: 0 0 0 0 var(--ink);
+}
+.hero .back {
+  margin-bottom: 0.5rem;
+}
+.gate-top {
+  grid-column: 1 / -1;
+}
+
+/* ------------------------------------------------------------ alerts */
+.alert {
+  margin-top: 1rem;
+  padding: 0.9rem 1.1rem;
+  border: 2px solid var(--ink);
+  border-radius: 1rem;
+  background: oklch(0.95 0.05 27);
+  box-shadow: var(--shadow-1);
+  color: oklch(0.38 0.14 27);
+}
+.alert strong {
+  display: block;
+  margin-bottom: 0.15rem;
+}
+
+/* ------------------------------------------------------- loading skeletons */
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+.skeleton {
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+  background: var(--muted);
+  box-shadow: var(--shadow-2);
+  min-height: 15rem;
+  animation: pulse 1.3s ease-in-out infinite;
+}
+.skeleton.line {
+  min-height: 1rem;
+  border-radius: 0.5rem;
+  box-shadow: none;
+  border-width: 0;
+  margin: 0.5rem 0;
+}
+
+/* ------------------------------------------------------- page transitions */
+/* The header and the bottom strip are the same on every page, so they stay put while the page slides. */
+.bar {
+  view-transition-name: bar;
+}
+.bottomnav {
+  view-transition-name: bottomnav;
+}
+@keyframes vt-out-left {
+  to {
+    opacity: 0;
+    transform: translateX(-28px);
+  }
+}
+@keyframes vt-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(28px);
+  }
+}
+@keyframes vt-out-right {
+  to {
+    opacity: 0;
+    transform: translateX(28px);
+  }
+}
+@keyframes vt-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-28px);
+  }
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 240ms;
+  animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+  animation-fill-mode: both;
+}
+[data-nav="forward"]::view-transition-old(root) {
+  animation-name: vt-out-left;
+}
+[data-nav="forward"]::view-transition-new(root) {
+  animation-name: vt-in-right;
+}
+[data-nav="back"]::view-transition-old(root) {
+  animation-name: vt-out-right;
+}
+[data-nav="back"]::view-transition-new(root) {
+  animation-name: vt-in-left;
+}
+::view-transition-group(bar),
+::view-transition-group(bottomnav) {
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+  .skeleton {
+    animation: none;
+  }
+}
+
+/* eight tabs: tighter so they fit at laptop widths, and a soft fade where a narrow screen still scrolls */
+.bar {
+  gap: 0.85rem;
+}
+.bar nav a {
+  padding: 0 0.62rem;
+  font-size: 0.875rem;
+}
+@media (max-width: 1240px) {
+  .bar nav {
+    mask-image: linear-gradient(to right, #000 calc(100% - 2rem), transparent);
+  }
+}
+.bar nav {
+  flex: 1 1 auto;
+}
+.bar .grow {
+  flex: 0 0 0;
+}
+@media (max-width: 760px) {
+  .bar .grow {
+    flex: 1;
+  }
+}
+
+/* an error sits inside the card that caused it */
+.gate section .alert {
+  margin: 0.75rem 0 0;
+}
+.gate section label.check {
+  font-size: 0.875rem;
+}
+
+.nsec {
+  user-select: all;
+}
+/* new-version notice: a pill above everything, above the mobile tab strip too */
+.update {
+  position: fixed;
+  left: 50%;
+  bottom: 1.25rem;
+  transform: translateX(-50%);
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  max-width: calc(100vw - 2rem);
+  padding: 0.55rem 0.6rem 0.55rem 1.1rem;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: var(--hero);
+  color: var(--hero-fg);
+  box-shadow: var(--shadow-2);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+@media (max-width: 760px) {
+  .update {
+    bottom: 4.6rem;
+  }
+}
+
+/* in-page links ("How it works") scroll smoothly and stop below the sticky header */
+html {
+  scroll-behavior: smooth;
+}
+[id] {
+  scroll-margin-top: 5rem;
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* ================================================================== landing motion
+ * Everything here is movement and fade (transform, opacity): the two things the browser animates without
+ * re-laying-out the page. No glow, no blur; the one highlight is a flat diagonal sweep across the button.
+ * `prefers-reduced-motion` switches all of it off at the bottom.
+ */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.hero-anim .rise {
+  animation: rise 0.7s cubic-bezier(0.2, 0, 0, 1) both;
+  animation-delay: var(--d, 0s);
+}
+.hero-anim .hero:not(.cta) h1 .w {
+  display: inline-block;
+  animation: rise 0.75s cubic-bezier(0.2, 0, 0, 1) both;
+  animation-delay: calc(0.2s + var(--i, 0) * 65ms);
+}
+
+/* the frames: the middle one drops in and lands, two more slide out of it (a scene forking), play pulses */
+.film-art .fa {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@keyframes fa-drop {
+  0% {
+    transform: translateY(-80px) scale(0.92);
+    opacity: 0;
+  }
+  45% {
+    opacity: 1;
+  }
+  68% {
+    transform: translateY(7px) scale(1.01);
+  }
+  84% {
+    transform: translateY(-3px);
+  }
+  100% {
+    transform: none;
+    opacity: 1;
+  }
+}
+@keyframes fa-out-l {
+  from {
+    transform: translate(42px, 8px) scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+@keyframes fa-out-r {
+  from {
+    transform: translate(-42px, 8px) scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+@keyframes fa-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.16);
+  }
+}
+.film-art.animate .fa-mid {
+  animation: fa-drop 0.95s cubic-bezier(0.2, 0, 0, 1) 0.3s both;
+}
+.film-art.animate .fa-left {
+  animation: fa-out-l 0.75s cubic-bezier(0.2, 0, 0, 1) 1.05s both;
+}
+.film-art.animate .fa-right {
+  animation: fa-out-r 0.75s cubic-bezier(0.2, 0, 0, 1) 1.15s both;
+}
+.film-art.animate .fa-play {
+  animation: fa-pulse 0.7s ease-in-out 1.95s 1 both;
+}
+/* the closing banner's frames wait until the banner has scrolled in */
+.landing.anim .reveal:not(.in) .film-art.animate .fa {
+  animation: none;
+  opacity: 0;
+}
+
+/* sections arrive as they scroll into view, in a short stagger (--i is the position in the row) */
+.landing.anim .reveal {
+  opacity: 0;
+  transform: translateY(26px);
+}
+.landing.anim .reveal.in {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.6s cubic-bezier(0.2, 0, 0, 1) calc(var(--i, 0) * 90ms),
+    transform 0.65s cubic-bezier(0.2, 0, 0, 1) calc(var(--i, 0) * 90ms);
+}
+/* once arrived, the element's own quick transitions (hover lift) come back */
+.landing.anim .reveal.done {
+  transition:
+    transform 140ms cubic-bezier(0.2, 0, 0, 1),
+    box-shadow 140ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* how it works: the numbers pop in and a line draws from each card to the next */
+.landing.anim .step-card .step-no {
+  transform: scale(0);
+}
+.landing.anim .step-card.in .step-no {
+  transform: none;
+  transition: transform 0.5s cubic-bezier(0.3, 1.7, 0.5, 1) calc(var(--i, 0) * 140ms + 0.3s);
+}
+.step-card:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: calc(1.1rem + 1rem - 1px);
+  left: calc(1.1rem + 2rem + 0.45rem);
+  right: calc(-1.1rem - 2px);
+  height: 2px;
+  background: var(--ink);
+  transform-origin: left center;
+  pointer-events: none;
+}
+.landing.anim .step-card:not(:last-child)::after {
+  transform: scaleX(0);
+}
+.landing.anim .step-card.in:not(:last-child)::after {
+  transform: scaleX(1);
+  transition: transform 0.7s cubic-bezier(0.2, 0, 0, 1) calc(var(--i, 0) * 140ms + 0.7s);
+}
+@media (max-width: 900px) {
+  .step-card:not(:last-child)::after {
+    display: none;
+  }
+}
+
+/* feature cards lift when pointed at */
+.landing .grid > .card {
+  transition:
+    transform 140ms cubic-bezier(0.2, 0, 0, 1),
+    box-shadow 140ms cubic-bezier(0.2, 0, 0, 1);
+}
+.landing .grid > .card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 7px 0 0 var(--ink);
+}
+
+/* the header picks up a hard shadow once the page has scrolled under it */
+.bar {
+  transition: box-shadow 200ms ease;
+}
+.bar.scrolled {
+  box-shadow: 0 3px 0 0 color-mix(in oklab, var(--ink) 20%, transparent);
+}
+
+/* a diagonal highlight crosses the main button every few seconds */
+@keyframes shine {
+  0%,
+  72% {
+    transform: translateX(-260%) skewX(-18deg);
+  }
+  100% {
+    transform: translateX(460%) skewX(-18deg);
+  }
+}
+.btn.shine {
+  position: relative;
+  overflow: hidden;
+}
+.btn.shine::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 38%;
+  background: linear-gradient(100deg, transparent, rgb(255 255 255 / 0.5), transparent);
+  animation: shine 5.5s ease-in-out 2.6s infinite;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-anim .rise,
+  .hero-anim .hero:not(.cta) h1 .w,
+  .film-art.animate .fa,
+  .btn.shine::after {
+    animation: none !important;
+    opacity: 1;
+  }
+  .btn.shine::after {
+    display: none;
+  }
+  .landing .reveal,
+  .landing .step-card .step-no,
+  .landing .step-card::after {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* testnet */
+.testnet-badge {
+  text-decoration: none;
+  flex: none;
+}
+ol.guide {
+  list-style: none;
+  counter-reset: g;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+}
+ol.guide li {
+  counter-increment: g;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0.8rem;
+  border: 2px solid var(--ink);
+  border-radius: 1rem;
+  background: var(--card);
+  box-shadow: var(--shadow-1);
+  font-weight: 500;
+}
+ol.guide li::before {
+  content: counter(g);
+  flex: none;
+  width: 1.6rem;
+  height: 1.6rem;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--primary-fg);
+  font: 700 0.75rem var(--font-mono);
+}
+ol.guide li.done::before {
+  background: var(--fair-tint);
+  color: var(--fair);
+  content: "✓";
+}
+@media (max-width: 760px) {
+  .testnet-badge {
+    order: 2;
+    font-size: 0.7rem;
+  }
+}
+
+/* ===================================================== one column, one edge
+ * The header and the page used to have different widths, so on a wide (or zoomed-out) screen the logo sat
+ * far left and the buttons far right of a small block in the middle. Both now share one width, which also
+ * grows on big screens instead of leaving a narrow strip in a sea of cream.
+ */
+:root {
+  --page: clamp(1100px, 62vw, 1560px);
+}
+.wrap {
+  max-width: var(--page);
+}
+@media (min-width: 761px) {
+  .bar {
+    padding-inline: max(1.25rem, calc((100% - var(--page)) / 2 + 1.25rem));
+  }
+}
+.gate {
+  max-width: min(var(--page), 1100px);
+}
+
+/* equal-height cards in a row, plain-words boxes */
+.cols {
+  align-items: stretch;
+}
+.cols > .card {
+  height: 100%;
+  margin-bottom: 1.25rem;
+}
+.explain {
+  margin: 1.25rem 0;
+  max-width: 100%;
+}
+.explain ol {
+  margin: 0.6rem 0 0;
+}
+.next {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 2px solid var(--ink);
+}
+
+/* native shell: keep the header clear of the status bar / notch */
+.bar {
+  padding-top: calc(0.55rem + env(safe-area-inset-top));
+}
+
+/* header: one line, nothing clipped, at laptop widths */
+:root {
+  --page: clamp(1200px, 66vw, 1600px);
+}
+.bar nav a {
+  padding: 0 0.6rem;
+}
+.bar .signout {
+  white-space: nowrap;
+}
